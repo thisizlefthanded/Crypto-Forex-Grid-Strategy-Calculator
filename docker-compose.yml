@@ -1,0 +1,31 @@
+# GridCalc — Crypto & Forex Grid Strategy Calculator
+# Works with Hostinger VPS Docker Manager, Portainer, or plain `docker compose up -d`.
+# Set PORT to change the host port (default 80).
+
+services:
+  gridcalc:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: gridcalc:latest
+    container_name: gridcalc
+    restart: unless-stopped
+    ports:
+      - "${PORT:-80}:80"
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx
+      - /var/run
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/healthz"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          memory: 64m
